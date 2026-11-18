@@ -54,7 +54,7 @@ final class App: NSObject, NSApplicationDelegate {
     private let measuredSpeed = NSTextField(labelWithString: "Estimated: — WPM")
     private let noiseFilter = NSButton(checkboxWithTitle: "Suppress isolated E/I", target: nil, action: nil)
     private let output = NSTextView.scrollableTextView()
-    private let status = NSTextField(labelWithString: "Select a radio input or open an audio recording.")
+    private let status = NSTextField(labelWithString: "Select an audio input or open a recording.")
     private let level = NSLevelIndicator()
     private let start = NSButton(title: "Start Receiving", target: nil, action: nil)
     private let refresh = NSButton(title: "Refresh Inputs", target: nil, action: nil)
@@ -72,7 +72,7 @@ final class App: NSObject, NSApplicationDelegate {
         window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 780, height: 610),
                           styleMask: [.titled, .closable, .miniaturizable, .resizable],
                           backing: .buffered, defer: false)
-        window.title = "CW Decoder · USB Audio"
+        window.title = "CW Decoder"
         window.minSize = NSSize(width: 650, height: 510)
         window.center()
         channel.addItems(withTitles: ["1 · Left", "2 · Right"])
@@ -134,8 +134,8 @@ final class App: NSObject, NSApplicationDelegate {
         window.contentView = base
 
         let menu = NSMenu()
-        let appMenu = NSMenu(title: "IC-9700 CW")
-        appMenu.addItem(withTitle: "Quit IC-9700 CW", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
+        let appMenu = NSMenu(title: "CW Decoder")
+        appMenu.addItem(withTitle: "Quit CW Decoder", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
         let appItem = NSMenuItem()
         appItem.submenu = appMenu
         menu.addItem(appItem)
@@ -220,7 +220,7 @@ final class App: NSObject, NSApplicationDelegate {
             DispatchQueue.main.async {
                 self.setBusy(false)
                 guard granted else {
-                    self.status.stringValue = "Allow microphone access for IC-9700 CW in macOS Privacy & Security settings."
+                    self.status.stringValue = "Allow microphone access for CW Decoder in macOS Privacy & Security settings."
                     return
                 }
                 self.receive(device, params)
@@ -383,7 +383,7 @@ func decodeRecording(_ url: URL, pitch: Double, wpm: Double, channel: Int,
     let format = file.processingFormat
     guard format.channelCount > channel, format.sampleRate >= 8000,
           let buffer = AVAudioPCMBuffer(pcmFormat: format, frameCapacity: 4096) else {
-        throw NSError(domain: "IC9700CW", code: 1,
+        throw NSError(domain: "CWDecoder", code: 1,
                       userInfo: [NSLocalizedDescriptionKey: "The recording lacks the selected channel or has a sample rate below 8 kHz."])
     }
     let decoder = CWDecoder(sampleRate: format.sampleRate, pitch: pitch, wpm: wpm,
@@ -419,7 +419,7 @@ if CommandLine.arguments.count == 6, CommandLine.arguments[1] == "--decode",
         exit(1)
     }
 } else if CommandLine.arguments.dropFirst().first == "--decode" {
-    FileHandle.standardError.write(Data("Usage: IC9700CW --decode recording.wav tone_hz wpm channel\n".utf8))
+    FileHandle.standardError.write(Data("Usage: CWDecoder --decode recording.wav tone_hz wpm channel\n".utf8))
     exit(2)
 } else {
     let app = NSApplication.shared
