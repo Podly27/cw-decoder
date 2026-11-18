@@ -1,5 +1,8 @@
 # IC-9700 CW
 
+<img src="assets/icon.png" width="96" alt="CW Decoder app icon">
+
+
 A standalone Morse code decoder for macOS. It decodes one CW signal at a time from a Core Audio input or an audio recording.
 
 ## Receive from a radio
